@@ -13,7 +13,7 @@ class CodigoCSVService
     {
         $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $maximoIntentos = 100;
-        $ttl = 60 * 60 * 24 * 365; // TTL en segundos
+        $ttl = 60 * 60 * 24 * 365 * 5; // TTL en segundos
 
         $redis = new Client([
             'host' => env('REDIS_HOST'),
@@ -23,19 +23,19 @@ class CodigoCSVService
         $redis->connect();
 
         for ($i = 0; $i < $maximoIntentos; $i++) {
-            $codigo = substr(str_shuffle($caracteres), 0, $longitud);
+            $codigo = str_shuffle(substr(str_repeat($caracteres, $longitud), 0, $longitud));
 
             // Buscar el código en la caché
             $cachedCode = $redis->get($codigo);
 
             if ($cachedCode) {
-                return $cachedCode;
+                continue;
             }
 
             // Verificar si el código ya existe en la base de datos
             $existe = DB::table('documentos')->where('csv', $codigo)->exists();
 
-            if (!$existe) {
+            if ( !$existe ) {
                 // Guardar el código en la caché
                 $redis->set($codigo, $codigo, $ttl);
 
@@ -44,7 +44,12 @@ class CodigoCSVService
                     'csv' => $codigo,
                 ]);
                 $documento->save();
+                
                 return $codigo;
+
+            } else {
+
+                $redis->set($codigo, $codigo, $ttl);
             }
         }
 
