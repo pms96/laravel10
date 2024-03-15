@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Documento;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Predis\Client;
@@ -12,7 +13,7 @@ class CodigoCSVService
     {
         $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $maximoIntentos = 100;
-        $ttl = 60; // TTL en segundos
+        $ttl = 60 * 60 * 24 * 365; // TTL en segundos
 
         $redis = new Client([
             'host' => env('REDIS_HOST'),
@@ -38,6 +39,11 @@ class CodigoCSVService
                 // Guardar el código en la caché
                 $redis->set($codigo, $codigo, $ttl);
 
+                // Guardar el documento en la base de datos
+                $documento = new Documento([
+                    'csv' => $codigo,
+                ]);
+                $documento->save();
                 return $codigo;
             }
         }
