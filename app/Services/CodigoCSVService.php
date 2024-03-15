@@ -7,22 +7,41 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use Predis\Client;
 
-class CodigoCSVService
+class CodigoCSVService implements CodigoCSVServiceInterface
 {
     public function generarCodigoCSV(int $longitud = 20): string
     {
         $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $maximoIntentos = 100;
-        $ttl = 60 * 60 * 24 * 365 * 5; // TTL en segundos
 
+        for ($i = 0; $i < $maximoIntentos; $i++) {
+
+            $codigo = str_shuffle(substr(str_repeat($caracteres, $longitud), 0, $longitud));
+
+            // Comprobamos que el csv no existe
+            if ( !Documento::where('csv', $codigo)->exists() ) {
+
+                return $codigo;
+            }
+        }
+
+        throw new Exception('No hay códigos CSV disponibles');
+    }
+
+
+
+    public function generarCodigoCSVRedis(int $longitud = 20): string
+    {
+        // Conexión a redis
         $redis = new Client([
             'host' => env('REDIS_HOST'),
             'port' => 6379,
         ]);
-
         $redis->connect();
 
-        for ($i = 0; $i < $maximoIntentos; $i++) {
+        $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+        do {
             $codigo = str_shuffle(substr(str_repeat($caracteres, $longitud), 0, $longitud));
 
             // Buscar el código en la caché
@@ -32,26 +51,22 @@ class CodigoCSVService
                 continue;
             }
 
+            // Verificamos que Redís se encuentra en funcioanamiento 
+            if (!config('database.redis')) {
+                throw new Exception('La variable de entorno REDIS_HOST no está configurada');
+            }
+
             // Verificar si el código ya existe en la base de datos
-            $existe = DB::table('documentos')->where('csv', $codigo)->exists();
+            $existe = Documento::where('csv', $codigo)->exists();
 
             if ( !$existe ) {
-                // Guardar el código en la caché
-                $redis->set($codigo, $codigo, $ttl);
-
-                // Guardar el documento en la base de datos
-                $documento = new Documento([
-                    'csv' => $codigo,
-                ]);
-                $documento->save();
+                // Guardar el código en la caché modo PERSIST
+                $redis->set($codigo, $codigo);
                 
                 return $codigo;
-
-            } else {
-
-                $redis->set($codigo, $codigo, $ttl);
             }
-        }
+
+        } while (true);
 
         throw new Exception('No hay códigos CSV disponibles');
     }
