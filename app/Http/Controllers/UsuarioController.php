@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Usuario;
 use App\Models\Documento;
 use Illuminate\Http\Request;
 use App\Services\CodigoCSVServiceInterface;
@@ -17,16 +18,11 @@ class UsuarioController extends Controller
         $this->codigoCSVService = $codigoCSVService;
     }
 
-    public function registro()
-    {
-        return view('registro');
-    }
-
     public function crearRegistro(Request $request)
     {
         try {
             // Aquí puedes usar el código generado para crear un nuevo usuario hay que añadir los inputs al formulario
-            // $usuario = new User();
+            // $usuario = new Usurio();
             // $usuario->nombre             = $request->input('nombre');
             // $usuario->apellido           = $request->input('apellido');
             // $usuario->nif                = $reques->input('nif);

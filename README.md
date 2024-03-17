@@ -8,7 +8,7 @@ sh create-project.sh // si tu SO es linus o mac
 sh create-project-windows.sh // si tu SO es windows
 
 ## levantar docker
-./vendor/laravel/sail up
+./vendor/laravel/sail up -d
 
 ## Comprobar el .env
 
@@ -27,13 +27,20 @@ para que el desarrollo en local sea correto
 
 ## preparar la bbdd 
 ./vendor/bin/sail artisan migrate
-./vendor/bin/sail db:seed --class=UsuariosSeeder
+./vendor/bin/sail artisan db:seed --class=UsuariosSeeder
 ./vendor/bin/sail artisan db:seed --class=InformacionUsuariosSeeder
 ./vendor/bin/sail artisan db:seed --class=FormularioUsuariosSeeder
+./vendor/bin/sail artisan db:seed --class=RolesSeeder
 
 
-## Ejercicio 1
-## Ejercicio 2
-## Ejercicio 3
-## Ejercicio 4
-## Ejercicio 5
+
+http://localhost 
+
+
+## Ejercicio 1 explicación 
+
+si pulsas en crear registro va añadiendo los csv en un sencillo formulario.
+cuando le das al boton enviar te devuelve el csv y en el caso de que no exístan más convinaciones posibles te devuelve el error.
+Hay dos funciones distintas para generar el csv.
+generateCSV: es un función simple en la cual yo la utilizaría en caso de que la aplicción no tuviese un gran número de registros. Ya que es mas sencilla y facil de mantener. 
+generateCSVRedis: Es una función un poco mas compleja donde se va almacenando los codigo en caché. Y sería óptima para un uso para una aplicación con un gran numero de registro y de tráfico. Ya que evitamos congestinar lo maxímo posible la base de datos.

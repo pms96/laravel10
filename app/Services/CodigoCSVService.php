@@ -35,7 +35,7 @@ class CodigoCSVService implements CodigoCSVServiceInterface
         // Conexión a redis
         $redis = new Client([
             'host' => env('REDIS_HOST'),
-            'port' => 6379,
+            'port' => env('REDIS_PORT'),
         ]);
         $redis->connect();
 
