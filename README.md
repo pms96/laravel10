@@ -7,8 +7,15 @@ cd laravel
 sh create-project.sh // si tu SO es linus o mac
 sh create-project-windows.sh // si tu SO es windows
 
-## levantar docker
-./vendor/laravel/sail up -d
+## instalar sail
+termial bash
+composer require laravel/sail --dev
+php artisan sail:install
+
+selecionamos solo pgslq y redis pulsando la tecla de espacio.
+
+## levantar docker con sail
+./vendor/laravel/sail up
 
 ## Comprobar el .env
 
