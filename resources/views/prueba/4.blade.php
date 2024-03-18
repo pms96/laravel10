@@ -16,6 +16,9 @@ use Carbon\Carbon;
     <!-- Contenido de las pestañas -->
     <div id="tab-content-1" class="tab-content active bg-white p-4 rounded-md shadow">
         <div class="container mx-auto mt-5">
+            Excluir los registros que aparecen en la tabla FormularioUsuarios durante los últimos 90 días si coincide el nif.
+        </div>
+        <div class="container mx-auto mt-5">
             SELECT f.*
             FROM "public"."FormularioUsuarios" f
             INNER JOIN "public"."Usuarios" u ON f."nif" = u."nif"
@@ -48,6 +51,9 @@ use Carbon\Carbon;
         @endif
     </div>
     <div id="tab-content-2" class="tab-content bg-white p-4 rounded-md shadow">
+        <div class="container mx-auto mt-5">
+            Usando el campo fecha_nacimiento y género, filtrar por personas con rasgo masculino mayores de 25 años, y con rasgo femenino mayores de 20 años.
+        </div>
         <div class="container mx-auto mt-5">
             SELECT u.* FROM "public"."Usuarios" u
             INNER JOIN "public"."InformacionUsuarios" i ON u.id = i.id_usuario
@@ -84,6 +90,9 @@ use Carbon\Carbon;
     </div>
     <div id="tab-content-3" class="tab-content bg-white p-4 rounded-md shadow">
         <div class="container mx-auto mt-5">
+            Asegurarse de que los usuarios tengan nif.
+        </div>
+        <div class="container mx-auto mt-5">
             SELECT * FROM "public"."Usuarios" WHERE nif IS NOT NULL;
         </div>
         @if( isset($tab3) )
@@ -114,6 +123,9 @@ use Carbon\Carbon;
         @endif
     </div>
     <div id="tab-content-4" class="tab-content bg-white p-4 rounded-md shadow">
+        <div class="container mx-auto mt-5">
+            Obtener una cuenta por grupo de edad de 10 en 10 años de las personas que resulten de este filtrado.
+        </div>
         <div class="container mx-auto mt-5">
             SELECT age_bucket AS age_range,
             COUNT(*) AS num_people
@@ -148,6 +160,9 @@ use Carbon\Carbon;
         @endif
     </div>
     <div id="tab-content-5" class="tab-content bg-white p-4 rounded-md shadow">
+        <div class="container mx-auto mt-5">
+            Filtrar los resultados para mostrar solo grupos de edad menores de 60 años.
+        </div>
         <div class="container mx-auto mt-5">
             SELECT
             *

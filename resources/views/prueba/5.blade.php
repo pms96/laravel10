@@ -18,6 +18,13 @@ use Carbon\Carbon;
         <div class="container mx-auto mt-5">
             Excluir los registros que aparecen en la tabla FormularioUsuarios durante los últimos 90 días si coincide el nif.
         </div>
+        <div class="container mx-auto mt-2">
+            FormularioUsuario::select('public.FormularioUsuarios.*')
+            ->join('public.Usuarios as u', 'public.FormularioUsuarios.nif', '=', 'u.nif')
+            ->whereNotNull('public.FormularioUsuarios.nif')
+            ->where('public.FormularioUsuarios.fecha_registro', '>=', Carbon::now()->subDays(90))
+            ->get()->toArray();
+        </div>
         @if( isset($tab1) )
             <div class="container mx-auto p-8">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -46,6 +53,19 @@ use Carbon\Carbon;
     <div id="tab-content-2" class="tab-content bg-white p-4 rounded-md shadow">
         <div class="container mx-auto mt-5">
             Usando el campo fecha_nacimiento y género, filtrar por personas con rasgo masculino mayores de 25 años, y con rasgo femenino mayores de 20 años.
+        </div>
+        <div class="container mx-auto mt-5">
+            Usuario::select('public.Usuarios.*')
+            ->join('public.InformacionUsuarios as i', 'public.Usuarios.id', '=', 'i.id_usuario')
+            ->where(function ($query) {
+                $query->where('i.genero', 'M')
+                    ->where('public.Usuarios.fecha_nacimiento', '<=', Carbon::now()->subYears(25));
+            })
+            ->orWhere(function ($query) {
+                $query->where('i.genero', 'F')
+                    ->where('public.Usuarios.fecha_nacimiento', '<=', Carbon::now()->subYears(20));
+            })
+            ->get()->toArray();
         </div>
         @if( isset($tab2) )
             <div class="container mx-auto p-8">
@@ -80,6 +100,9 @@ use Carbon\Carbon;
         <div class="container mx-auto mt-5">
             Asegurarse de que los usuarios tengan nif.
         </div>
+        <div class="container mx-auto mt-5">
+            Usuario::whereNotNull('nif')->get()->toArray();
+        </div>
         @if( isset($tab3) )
             <div class="container mx-auto p-8">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -111,6 +134,22 @@ use Carbon\Carbon;
         <div class="container mx-auto mt-5">
             Obtener una cuenta por grupo de edad de 10 en 10 años de las personas que resulten de este filtrado.
         </div>
+        <div class="container mx-auto mt-5">
+            Usuario::selectRaw('
+                    age_bucket AS age_range,
+                    COUNT(*) AS num_people
+                ')
+                ->fromSub(function ($query) {
+                    $query->selectRaw('
+                            WIDTH_BUCKET(EXTRACT(YEAR FROM AGE(fecha_nacimiento)), 0, 100, 10) - 1 AS age_bucket
+                        ')
+                        ->from('public.Usuarios')
+                        ->whereNotNull('nif');
+                }, 'age_ranges')
+                ->groupBy('age_bucket')
+                ->orderBy('age_bucket')
+                ->get()->toArray();
+        </div>
         @if( isset($tab4) )
             <div class="container mx-auto p-8">
                 <table class="min-w-full divide-y divide-gray-200">
@@ -135,6 +174,12 @@ use Carbon\Carbon;
     <div id="tab-content-5" class="tab-content bg-white p-4 rounded-md shadow">
         <div class="container mx-auto mt-5">
             Filtrar los resultados para mostrar solo grupos de edad menores de 60 años.
+        </div>
+        <div class="container mx-auto mt-3">
+            Usuario::whereNotNull('nif')
+            ->where('fecha_nacimiento', '>=', Carbon::now()->subYears(60))
+            ->orderBy('fecha_nacimiento')
+            ->get()->toArray();
         </div>
         @if( isset($tab5) )
             <div class="container mx-auto p-8">
