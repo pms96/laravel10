@@ -41,8 +41,8 @@ class CodigoCSVService implements CodigoCSVServiceInterface
 
         $caracteres = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
-        do {
-            $codigo = str_shuffle(substr(str_repeat($caracteres, $longitud), 0, $longitud));
+        do {            
+            $codigo = substr(str_shuffle(str_repeat($caracteres, $longitud)), 0, $longitud);
 
             // Buscar el código en la caché
             $cachedCode = $redis->get($codigo);

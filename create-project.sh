@@ -15,5 +15,5 @@
         -w /var/www \
         composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
     
-    docker exec -it laravel-app sh -c "php artisan key:generate"
-    docker exec -it laravel-app sh -c "php artisan cache:clear"
+    # docker exec -it laravel-app sh -c "php artisan key:generate"
+    # docker exec -it laravel-app sh -c "php artisan cache:clear"
